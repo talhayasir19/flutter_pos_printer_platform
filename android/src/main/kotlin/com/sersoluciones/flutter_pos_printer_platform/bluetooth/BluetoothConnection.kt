@@ -180,18 +180,26 @@ class BluetoothConnection constructor(handler: Handler) : IBluetoothConnection {
     /**
      * Indicate that the connection attempt failed and notify the UI Activity.
      */
-    private fun connectionFailed(result: MethodChannel.Result) {
-        // Send a failure message back to the Activity
-//        Log.e(TAG, "Connection Error");
+     private fun connectionFailed(result: MethodChannel.Result) {
+        // Notify Android UI (optional)
         val msg = mHandler.obtainMessage(BluetoothConstants.MESSAGE_TOAST)
         val bundle = Bundle()
         bundle.putInt(TOAST, R.string.fail_connect_bt)
         msg.data = bundle
         mHandler.sendMessage(msg)
+
         state = BluetoothConstants.STATE_FAILED
 
-        // Give the new state to the Handler so the UI Activity can update
-        mHandler.obtainMessage(BluetoothConstants.MESSAGE_STATE_CHANGE, state, -1, result).sendToTarget()
+        // Notify Flutter (return false)
+        result.success(false)
+
+        // Notify UI state change
+        mHandler.obtainMessage(
+            BluetoothConstants.MESSAGE_STATE_CHANGE,
+            state,
+            -1,
+            null
+        ).sendToTarget()
 
         state = BluetoothConstants.STATE_NONE
     }
